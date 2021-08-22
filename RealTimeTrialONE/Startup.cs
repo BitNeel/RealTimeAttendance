@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RealTimeTrialONE.api.Contexts;
+using RealTimeTrialONE.api.Repositories;
+using RealTimeTrialONE.api.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +31,9 @@ namespace RealTimeTrialONE
         {
             services.AddDbContext<HRMSDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("HRMSConnection")));
             services.AddControllers();
+            services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+            services.AddScoped<IEmployeeRoleService, EmployeeRoleService>();
+            services.AddCors(o => o.AddPolicy("MyPolicy", builder => { builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader(); }));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -36,12 +41,21 @@ namespace RealTimeTrialONE
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                Console.WriteLine("In development");
+                //app.UseDeveloperExceptionPage();
+                app.UseExceptionHandler("/local-error");
             }
+            else
+            {
+                app.UseExceptionHandler("/local-error");
+            }
+
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors("MyPolicy");
 
             app.UseAuthorization();
 

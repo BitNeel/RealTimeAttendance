@@ -9,5 +9,6 @@ namespace RealTimeTrialONE.api.Contexts
         { }
 
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<EmployeeRole> EmployeeRoles { get; set; }
     }
 }
